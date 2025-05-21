@@ -7,3 +7,6 @@ object Lista
 
 @Serializable
 data class Detail(val id : Int)
+
+@Serializable
+object Busqueda

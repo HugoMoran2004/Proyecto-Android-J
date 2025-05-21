@@ -6,6 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -22,6 +23,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -33,23 +35,32 @@ import androidx.compose.ui.unit.dp
 import coil.ImageLoader
 import com.example.proyectojunio.data.model.MediaItem
 import coil.compose.rememberAsyncImagePainter
+import com.example.proyectojunio.data.model.SerieDb
 import com.example.proyectojunio.data.model.Type
 
 
 
 @Composable
 fun ListaScreen(viewModel: ListaViewModel, navigateToDetail: (Int) -> Unit) {
+
+    val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        viewModel.carfarSeriesIniciales(context)
+    }
     val lista by viewModel.lista.observeAsState(emptyList())
     val progressBar by viewModel.progressBar.observeAsState(false)
 
-
+    Box(
+        modifier = Modifier.fillMaxSize().background(Color.Black)
+    )
 
     if (progressBar) {
         Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
-            CircularProgressIndicator()
+            CircularProgressIndicator(color = Color.White)
         }
     } else {
 
@@ -59,14 +70,15 @@ fun ListaScreen(viewModel: ListaViewModel, navigateToDetail: (Int) -> Unit) {
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
-                Text("No hay elementos", style = MaterialTheme.typography.bodySmall)
+                Text("No hay elementos", style = MaterialTheme.typography.bodySmall, color = Color.White)
             }
         } else {
 
             LazyVerticalGrid(
                 columns = GridCells.Fixed(2),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
-                //modifier = Modifier.fillMaxSize()
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.padding(8.dp)
             ) {
                 items(lista!!) { mediaItem ->
                     MediaListItem(mediaItem, navigateToDetail)
@@ -78,48 +90,42 @@ fun ListaScreen(viewModel: ListaViewModel, navigateToDetail: (Int) -> Unit) {
 }
 
 @Composable
-private fun MediaListItem(mediaItem: MediaItem, navigateToDetail: (Int) -> Unit) {
+private fun MediaListItem(mediaItem: SerieDb, navigateToDetail: (Int) -> Unit) {
     Column(
         modifier = Modifier
-            .width(200.dp)
-            .padding(2.dp)
+            .width(150.dp)
+            .height(250.dp)
             .clickable { navigateToDetail(mediaItem.id) },
         horizontalAlignment = Alignment.CenterHorizontally,
 
         ) {
         Imagen(item = mediaItem)
+        Spacer(modifier = Modifier.height(5.dp))
         Title(item = mediaItem)
     }
 }
 
 @Composable
-fun Imagen(item: MediaItem, modifier: Modifier = Modifier) {
+fun Imagen(item: SerieDb, modifier: Modifier = Modifier) {
     val context = LocalContext.current
+    val imageUrl = "https://image.tmdb.org/t/p/w185/${item.poster_path}"
+
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .height(200.dp)
+            .height(180.dp)
     ) {
 
         Image(
             painter = rememberAsyncImagePainter(
-                model = item.photo,
+                model = imageUrl,
                 imageLoader = ImageLoader.Builder(context).crossfade(true).build()
             ),
             contentDescription = null,
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
         )
-        if (item.tipo == Type.VIDEO) {
-            Icon(
-                imageVector = Icons.Default.Face,
-                contentDescription = null,
-                tint = Color.White,
-                modifier = Modifier
-                    .size(92.dp)
-                    .align(Alignment.Center)
-            )
-        }
+
 
     }
 }
@@ -127,17 +133,18 @@ fun Imagen(item: MediaItem, modifier: Modifier = Modifier) {
 
 
 @Composable
-fun Title(item: MediaItem) {
+fun Title(item: SerieDb) {
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.secondary)
-            .padding(16.dp)
+            .padding(5.dp)
     ) {
         Text(
-            text = item.title,
-            style = MaterialTheme.typography.displaySmall
+            text = item.original_name,
+            style = MaterialTheme.typography.bodySmall,
+            maxLines = 2
         )
     }
 }

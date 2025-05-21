@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
+    id("kotlin-kapt")
 }
 
 android {
@@ -53,6 +54,9 @@ dependencies {
     implementation(libs.androidx.runtime.livedata)
     implementation("androidx.navigation:navigation-compose:2.8.3")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
+    //implementation(libs.androidx.room.runtime.jvm)
+    implementation(libs.androidx.room.common.jvm)
+    implementation(libs.androidx.room.runtime)
     testImplementation(libs.junit)
 
     implementation(libs.coil)
@@ -66,5 +70,5 @@ dependencies {
     implementation (libs.retrofit)
     implementation (libs.converter.gson)
 
-
+    kapt(libs.androidx.room.compiler.v271)
 }
